@@ -35,15 +35,19 @@ namespace desawebback.Services
             var rosterLocal = partido.Roster
                                      .Where(jp => jp.Jugador.EquipoId == partido.EquipoLocalId)
                                      .Select(jp => new JugadorResponseDto {
-                                         Id = jp.Jugador.Id,
-                                         NombreCompleto = jp.Jugador.NombreCompleto
+                                          Id = jp.Jugador.Id,
+                                        NombreCompleto = jp.Jugador.NombreCompleto,
+                                        Numero = jp.Jugador.Numero,
+                                        Posicion = jp.Jugador.Posicion,
                                      }).ToList();
 
             var rosterVisitante = partido.Roster
                                         .Where(jp => jp.Jugador.EquipoId == partido.EquipoVisitanteId)
                                         .Select(jp => new JugadorResponseDto {
-                                            Id = jp.Jugador.Id,
-                                            NombreCompleto = jp.Jugador.NombreCompleto
+                                           Id = jp.Jugador.Id,
+                                        NombreCompleto = jp.Jugador.NombreCompleto,
+                                        Numero = jp.Jugador.Numero,
+                                        Posicion = jp.Jugador.Posicion,
                                         }).ToList();
 
             return new PartidoResponseDto
