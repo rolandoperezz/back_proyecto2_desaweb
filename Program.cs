@@ -113,6 +113,8 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -127,5 +129,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (var scope = scopeFactory.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();  // Aplica migraciones al arrancar
+}
 
 app.Run();
