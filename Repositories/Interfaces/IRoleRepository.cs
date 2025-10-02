@@ -11,7 +11,12 @@ namespace desawebback.Repositories.Interfaces
         /// <param name="name"></param>
         /// <returns>Retorna la primer coincidencia</returns>
         Task<Role?> GetByNameAsync(string name);
-       Task AddAsync(Role role);
+        Task AddAsync(Role role);
         Task<bool> ExistsByNameAsync(string name);
+        
+        Task<List<Role>> GetAllAsync();
+        Task<Role?> GetByIdAsync(int id);
+        Task UpdateAsync(Role role);
+        Task DeleteAsync(int id);
     }
 }

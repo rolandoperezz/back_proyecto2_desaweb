@@ -115,15 +115,18 @@ var app = builder.Build();
 
 
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+ app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
-app.UseCors("CorsPolicy");
+app.UseCors(builder =>
+    builder
+        .AllowAnyOrigin()       // o .WithOrigins("http://tu-dominio") si quieres restringir
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+);
 
 app.UseAuthentication();
 app.UseAuthorization();

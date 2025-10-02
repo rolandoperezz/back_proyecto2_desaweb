@@ -1,8 +1,8 @@
 using desawebback.Models;
 using desawebback.Data;
 using Microsoft.EntityFrameworkCore;
-using desawebback.Repositories.Interfaces; // Asegúrate de tener este using
-
+using desawebback.Repositories.Interfaces; 
+using desawebback.DTOs; 
 namespace desawebback.Repositories
 {
     public class RoleRepository(AppDbContext context) : IRoleRepository
@@ -28,5 +28,37 @@ namespace desawebback.Repositories
         {
             return await _context.Roles.AnyAsync(r => r.Name == name);
         }
+
+        // Agregar al final de la clase, antes del cierre }
+public async Task<List<Role>> GetAllAsync()
+{
+    return await _context.Roles
+        .OrderBy(r => r.Name)
+        .ThenBy(r => r.Id)
+        .ToListAsync();
+}
+
+
+
+public async Task<Role?> GetByIdAsync(int id)
+{
+    return await _context.Roles.FindAsync(id);
+}
+
+public async Task UpdateAsync(Role role)
+{
+    _context.Roles.Update(role);
+    await _context.SaveChangesAsync();
+}
+
+public async Task DeleteAsync(int id)
+{
+    var role = await GetByIdAsync(id);
+    if (role != null)
+    {
+        _context.Roles.Remove(role);
+        await _context.SaveChangesAsync();
+    }
+}
     }
 }

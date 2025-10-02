@@ -81,18 +81,18 @@ namespace desawebback.Services
                 new Claim(ClaimTypes.Role, roleName),
                 new Claim("Id", _cryptoHelper.Encrypt(user.Id.ToString()))
             };
-                var token = new JwtSecurityToken(
-                    issuer: jwtSettings["Issuer"],
-                    audience: jwtSettings["Audience"],
-                    claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiresInMinutes"])),
-                    signingCredentials: creds
-                );
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiresInMinutes"])),
+                signingCredentials: creds
+            );
 
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        
+
 
         public async Task<bool> CreateRoleAsync(RoleDto roleDto)
         {
@@ -107,5 +107,118 @@ namespace desawebback.Services
             await _roleRepository.AddAsync(role);
             return true;
         }
+        // Agregar antes del último cierre } de la clase
+
+public async Task<List<UserDto>> GetAllUsersAsync()
+{
+    var users = await _userRepository.GetAllWithRolesAsync();
+    return users.Select(u => new UserDto
+    {
+        Id = u.Id,
+        Username = u.Username,
+        RoleName = u.Role?.Name ?? "",
+        RoleId = u.RoleId,
+        CreatedAt = u.CreatedAt
+    }).ToList();
+}
+
+public async Task<UserDto?> GetUserByIdAsync(int id)
+{
+    var user = await _userRepository.GetByIdAsync(id);
+    if (user == null) return null;
+
+    return new UserDto
+    {
+        Id = user.Id,
+        Username = user.Username,
+        RoleName = user.Role?.Name ?? "",
+        RoleId = user.RoleId,
+        CreatedAt = user.CreatedAt
+    };
+}
+
+public async Task<bool> UpdateUserAsync(int id, UpdateUserDto updateDto)
+{
+    var user = await _userRepository.GetByIdAsync(id);
+    if (user == null) return false;
+
+    var usernameExists = await _userRepository.GetByUsernameAsync(updateDto.Username);
+    if (usernameExists != null && usernameExists.Id != id)
+        return false;
+
+    var role = await _roleRepository.GetByIdAsync(updateDto.RoleId);
+    if (role == null) return false;
+
+    user.Username = updateDto.Username;
+    user.RoleId = updateDto.RoleId;
+    user.UpdatedAt = DateTime.Now;
+
+    await _userRepository.UpdateAsync(user);
+    return true;
+}
+
+public async Task<bool> DeleteUserAsync(int id)
+{
+    var user = await _userRepository.GetByIdAsync(id);
+    if (user == null) return false;
+
+    await _userRepository.DeleteAsync(id);
+    return true;
+}
+
+public async Task<bool> ChangePasswordAsync(int id, ChangePasswordDto changePasswordDto)
+{
+    var user = await _userRepository.GetByIdAsync(id);
+    if (user == null) return false;
+
+    user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+    user.UpdatedAt = DateTime.Now;
+
+    await _userRepository.UpdateAsync(user);
+    return true;
+}
+
+public async Task<List<RoleDto>> GetAllRolesAsync()
+{
+    var roles = await _roleRepository.GetAllAsync();
+    return roles.Select(r => new RoleDto { Id = r.Id, Name = r.Name }).ToList();
+}
+
+public async Task<RoleDto?> GetRoleByIdAsync(int id)
+{
+    var role = await _roleRepository.GetByIdAsync(id);
+    if (role == null) return null;
+
+    return new RoleDto { Id = role.Id, Name = role.Name };
+}
+
+public async Task<bool> UpdateRoleAsync(int id, UpdateRoleDto updateDto)
+{
+    var role = await _roleRepository.GetByIdAsync(id);
+    if (role == null) return false;
+
+    var roleExists = await _roleRepository.ExistsByNameAsync(updateDto.Name);
+    if (roleExists)
+    {
+        var existingRole = await _roleRepository.GetByNameAsync(updateDto.Name);
+        if (existingRole != null && existingRole.Id != id)
+            return false;
+    }
+
+    role.Name = updateDto.Name;
+    role.UpdatedAt = DateTime.Now;
+
+    await _roleRepository.UpdateAsync(role);
+    return true;
+}
+
+public async Task<bool> DeleteRoleAsync(int id)
+{
+    var role = await _roleRepository.GetByIdAsync(id);
+    if (role == null) return false;
+
+    await _roleRepository.DeleteAsync(id);
+    return true;
+}
     }
 }
