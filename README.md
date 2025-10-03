@@ -32,8 +32,8 @@ Antes de comenzar, asegúrate de tener instalado:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/desawebback.git
-cd desawebback
+[https://github.com/rolandoperezz/back_proyecto2_desaweb.git]
+cd back_proyecto2_desaweb
 ```
 
 ### 2. Configurar la base de datos
